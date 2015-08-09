@@ -6,7 +6,8 @@
         Closing="OnClose" 
         StateChanged="OnStateChanged" 
         IsVisibleChanged="OnIsVisibleChanged"
-        ResizeMode="NoResize">
+        ResizeMode="CanMinimize"
+        Icon="DD53_Logo_Medium.ico">
     <Grid>
         <DockPanel>
             <Menu DockPanel.Dock="Top">
