@@ -1,0 +1,41 @@
+﻿<Window x:Class="DynDns53.UI.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:tb="http://www.hardcodet.net/taskbar"
+        Title="DynDns53" Height="397.15" Width="750"
+        Closing="OnClose" 
+        StateChanged="OnStateChanged" 
+        IsVisibleChanged="OnIsVisibleChanged"
+        ResizeMode="NoResize">
+    <Grid>
+        <DockPanel>
+            <Menu DockPanel.Dock="Top">
+                <MenuItem Header="_File">
+                    <MenuItem Header="_Exit" Click="Exit_Click"/>
+                </MenuItem>
+            </Menu>
+            <StackPanel></StackPanel>
+        </DockPanel>
+        <Button x:Name="settingsButton" Content="Settings" HorizontalAlignment="Left" Margin="4,261,0,0" VerticalAlignment="Top" Width="207" Height="41" Click="settingsButton_Click" FontFamily="Tahoma" FontSize="16"/>
+        <Button x:Name="updateButton" Content="Update Now" HorizontalAlignment="Left" Margin="3,316,0,0" VerticalAlignment="Top" Width="207" Height="41" Click="updateButton_Click" FontFamily="Tahoma" FontSize="16"/>
+        <Image x:Name="image" HorizontalAlignment="Left" Height="205
+               " VerticalAlignment="Top" Width="205" Source="DD53_Logo_Medium.ico" Stretch="Fill" Margin="0,23,0,0"/>
+        <ListBox x:Name="logListBox" Height="334" Margin="212,23,0,0" Width="520" RenderTransformOrigin="0.5,0.5"/>
+
+        <tb:TaskbarIcon Name="notifyIcon"
+                        IconSource="DD53_Logo_Medium.ico"
+                        ToolTipText="DD53" TrayLeftMouseUp="notifyIcon_Click"
+                        >
+            <tb:TaskbarIcon.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Exit" Click="Exit_Click" />
+                </ContextMenu>
+            </tb:TaskbarIcon.ContextMenu>
+        </tb:TaskbarIcon>
+
+
+    </Grid>
+
+
+
+</Window>
