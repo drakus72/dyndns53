@@ -20,6 +20,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace DynDns53.UI
 {
@@ -32,6 +33,8 @@ namespace DynDns53.UI
         private DnsUpdater _dnsUpdater;
         private IIpChecker _ipChecker;
         private IConfigHandler _configHandler;
+        private DispatcherTimer _timer;
+
 
         public MainWindow()
 		{
@@ -57,11 +60,17 @@ namespace DynDns53.UI
             {
                 AddLog($"{domainInfo.DomainName}");
             }
+
+            if (_timer != null)
+            {
+                // Stop to avoid multiple timer_Tick invocations
+                _timer.Stop();
+            }
             
-            System.Windows.Threading.DispatcherTimer dispatcherTimer = new System.Windows.Threading.DispatcherTimer();
-            dispatcherTimer.Tick += dispatcherTimer_Tick;
-            dispatcherTimer.Interval = new TimeSpan(0, interval, 0);
-            dispatcherTimer.Start();
+            _timer = new System.Windows.Threading.DispatcherTimer();
+            _timer.Tick += timer_Tick;
+            _timer.Interval = new TimeSpan(0, interval, 0);
+            _timer.Start();
 
             AddLog($"Time set to update domains every {interval} minutes");
 
@@ -86,7 +95,7 @@ namespace DynDns53.UI
             }
         }
 
-        private void dispatcherTimer_Tick(object sender, EventArgs e)
+        private void timer_Tick(object sender, EventArgs e)
         {
             Update();
         }
@@ -194,6 +203,11 @@ namespace DynDns53.UI
             }
 
             logListBox.SelectedItem = logListBox.Items[0];
+        }
+
+        private void MenuItemClearAll_Click(object sender, RoutedEventArgs e)
+        {
+            logListBox.Items.Clear();
         }
     }
 }
