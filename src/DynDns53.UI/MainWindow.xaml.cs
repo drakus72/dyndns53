@@ -47,8 +47,6 @@ namespace DynDns53.UI
         {
             AddLog("Loading configuration values...");
 
-            int interval = Int32.Parse(ConfigurationManager.AppSettings["UpdateInterval"]);
-            
             _configHandler = new AppConfigHandler();
             var config = _configHandler.GetConfig();
             _ipChecker = new AwsIpChecker();
@@ -66,7 +64,8 @@ namespace DynDns53.UI
                 // Stop to avoid multiple timer_Tick invocations
                 _timer.Stop();
             }
-            
+
+            int interval = config.UpdateInterval;
             _timer = new System.Windows.Threading.DispatcherTimer();
             _timer.Tick += timer_Tick;
             _timer.Interval = new TimeSpan(0, interval, 0);

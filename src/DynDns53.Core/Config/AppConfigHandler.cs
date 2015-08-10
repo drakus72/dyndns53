@@ -15,24 +15,26 @@ namespace DynDns53.Core
 
         public DynDns53Config GetConfig()
         {
-            if (_config == null)
+            ConfigurationManager.RefreshSection("appSettings");
+            ConfigurationManager.RefreshSection("awsSettings");
+            ConfigurationManager.RefreshSection("domainSettings");
+
+
+            _config = new DynDns53Config();
+
+            string exeFile = System.Reflection.Assembly.GetCallingAssembly().Location;
+            var configFile = ConfigurationManager.OpenExeConfiguration(exeFile);
+
+            _config.UpdateInterval = int.Parse(ConfigurationManager.AppSettings["UpdateInterval"]);
+            _config.ClientId = ConfigurationManager.AppSettings["ClientId"];
+            _config.Route53AccessKey = AwsSettings.Settings.Route53AccessKey;
+            _config.Route53SecretKey = AwsSettings.Settings.Route53SecretKey;
+            _config.RunAtSystemStart = bool.Parse(ConfigurationManager.AppSettings["RunAtSystemStart"]);
+
+            _config.DomainList = new List<HostedDomainInfo>();
+            foreach (DomainElement domainInfo in DomainSettings.Settings.DomainList)
             {
-                _config = new DynDns53Config();
-
-                string exeFile = System.Reflection.Assembly.GetCallingAssembly().Location;
-                var configFile = ConfigurationManager.OpenExeConfiguration(exeFile);
-
-                _config.UpdateInterval = int.Parse(ConfigurationManager.AppSettings["UpdateInterval"]);
-                _config.ClientId = ConfigurationManager.AppSettings["ClientId"];
-                _config.Route53AccessKey = AwsSettings.Settings.Route53AccessKey;
-                _config.Route53SecretKey = AwsSettings.Settings.Route53SecretKey;
-                _config.RunAtSystemStart = bool.Parse(ConfigurationManager.AppSettings["RunAtSystemStart"]);
-
-                _config.DomainList = new List<HostedDomainInfo>();
-                foreach (DomainElement domainInfo in DomainSettings.Settings.DomainList)
-                {
-                    _config.DomainList.Add(new HostedDomainInfo() { DomainName = domainInfo.SubDomain, ZoneId = domainInfo.ZoneId });
-                }
+                _config.DomainList.Add(new HostedDomainInfo() { DomainName = domainInfo.SubDomain, ZoneId = domainInfo.ZoneId });
             }
             
             return _config;
@@ -65,12 +67,6 @@ namespace DynDns53.Core
             }
             
             configFile.Save(ConfigurationSaveMode.Modified);
-
-            _config = null;
-
-            ConfigurationManager.RefreshSection("appSettings");
-            ConfigurationManager.RefreshSection("awsSettings");
-            ConfigurationManager.RefreshSection("domainSettings");
         }
     }
 }

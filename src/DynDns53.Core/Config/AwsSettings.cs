@@ -27,6 +27,8 @@ namespace DynDns53.Core
             get { return (string)this["route53SecretKey"]; }
             set { this["route53SecretKey"] = value; }
         }
+
+        
     }
 }
 
