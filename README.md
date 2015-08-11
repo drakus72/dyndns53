@@ -32,8 +32,8 @@ DynDns53.Service.exe uninstall
 # Links 
 
 * [Project website](http://dyndns53.com)
+* [Blog post](http://volkanpaksoy.com/archive/2015/08/12/2015-08-12-dynamic-dns-with-aws-route53/)
 
- 
  
 
 
