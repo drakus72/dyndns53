@@ -18,13 +18,12 @@ namespace DynDns53.Core
             ConfigurationManager.RefreshSection("appSettings");
             ConfigurationManager.RefreshSection("awsSettings");
             ConfigurationManager.RefreshSection("domainSettings");
-
-
+            
             _config = new DynDns53Config();
 
             string exeFile = System.Reflection.Assembly.GetCallingAssembly().Location;
             var configFile = ConfigurationManager.OpenExeConfiguration(exeFile);
-
+            
             _config.UpdateInterval = int.Parse(ConfigurationManager.AppSettings["UpdateInterval"]);
             _config.ClientId = ConfigurationManager.AppSettings["ClientId"];
             _config.Route53AccessKey = AwsSettings.Settings.Route53AccessKey;
