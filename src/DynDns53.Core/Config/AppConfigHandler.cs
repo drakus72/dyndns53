@@ -42,9 +42,8 @@ namespace DynDns53.Core
 
         public void SaveConfig(DynDns53Config config)
         {
-            string exeFolder = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-            string exeFile = Path.Combine(exeFolder, "DynDns53.UI.exe");
-            var configFile = ConfigurationManager.OpenExeConfiguration(exeFile);
+            string exeFileName = System.Reflection.Assembly.GetCallingAssembly().Location;
+            var configFile = ConfigurationManager.OpenExeConfiguration(exeFileName);
 
             configFile.AppSettings.Settings.Remove("UpdateInterval");
             configFile.AppSettings.Settings.Add("UpdateInterval", config.UpdateInterval.ToString());
