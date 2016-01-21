@@ -33,7 +33,10 @@ namespace DynDns53.Core
             _config.DomainList = new List<HostedDomainInfo>();
             foreach (DomainElement domainInfo in DomainSettings.Settings.DomainList)
             {
-                _config.DomainList.Add(new HostedDomainInfo() { DomainName = domainInfo.SubDomain, ZoneId = domainInfo.ZoneId });
+                if (!string.IsNullOrEmpty(domainInfo.SubDomain) && !string.IsNullOrEmpty(domainInfo.ZoneId))
+                {
+                    _config.DomainList.Add(new HostedDomainInfo() { DomainName = domainInfo.SubDomain, ZoneId = domainInfo.ZoneId });
+                }
             }
             
             return _config;

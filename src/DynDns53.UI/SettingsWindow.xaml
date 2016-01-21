@@ -27,7 +27,7 @@
                 </GridView>
             </ListView.View>
         </ListView>
-        <Label x:Name="label_Copy4" Content="Route 53 Secret Key:" HorizontalAlignment="Left" Margin="10,111,0,0" VerticalAlignment="Top" Width="142"/>
+        <Label x:Name="label_Copy4" Content="Run at system start:" HorizontalAlignment="Left" Margin="10,111,0,0" VerticalAlignment="Top" Width="142"/>
         <CheckBox x:Name="runAtStartCheckBox" Content="" HorizontalAlignment="Left" Margin="137,116,0,0" VerticalAlignment="Top"/>
         <Button x:Name="addDomainButton" Content="Add" HorizontalAlignment="Left" Margin="137,250,0,0" VerticalAlignment="Top" Width="75" Click="addDomainButton_Click"/>
         <Button x:Name="deleteDomainButton" Content="Delete" HorizontalAlignment="Left" Margin="217,250,0,0" VerticalAlignment="Top" Width="75" Click="deleteDomainButton_Click" IsEnabled="False"/>
