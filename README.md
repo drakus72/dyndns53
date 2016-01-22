@@ -13,7 +13,7 @@ The project has a WPF user interface and a Windows service. Both are using the s
 
 Just add your AWS keys that have access privileges to your domains. You can set it to run at system start so you don't have to start it manually.
 
-![](https://s3-eu-west-1.amazonaws.com/vpblogimg/2015/08/dyndns53-seetings-window.png)
+![](https://s3-eu-west-1.amazonaws.com/vpblogimg/2015/08/dyndns53-settings-window.png)
 
  
 I built the Windows service using Topshelf. To install it, build the application and on an elevated command prompt just run
