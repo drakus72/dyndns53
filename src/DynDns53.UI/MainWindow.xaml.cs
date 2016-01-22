@@ -35,7 +35,6 @@ namespace DynDns53.UI
         private IConfigHandler _configHandler;
         private DispatcherTimer _timer;
 
-
         public MainWindow()
 		{
 			InitializeComponent();
@@ -47,7 +46,8 @@ namespace DynDns53.UI
         {
             AddLog("Loading configuration values...");
 
-            _configHandler = new AppConfigHandler();
+            // _configHandler = new AppConfigHandler();
+            _configHandler = new JsonConfigHandler();
             var config = _configHandler.GetConfig();
             _ipChecker = new AwsIpChecker();
             IAmazonRoute53 _amazonClient = new AmazonRoute53Client(config.Route53AccessKey, config.Route53SecretKey, RegionEndpoint.EUWest1);

@@ -18,19 +18,22 @@ namespace DynDns53.Core
             ConfigurationManager.RefreshSection("appSettings");
             ConfigurationManager.RefreshSection("awsSettings");
             ConfigurationManager.RefreshSection("domainSettings");
-            
+
             _config = new DynDns53Config();
 
             string exeFile = System.Reflection.Assembly.GetCallingAssembly().Location;
             var configFile = ConfigurationManager.OpenExeConfiguration(exeFile);
             
+            var awsConfigSection = configFile.GetSection("awsSettings");
             _config.UpdateInterval = int.Parse(ConfigurationManager.AppSettings["UpdateInterval"]);
             _config.ClientId = ConfigurationManager.AppSettings["ClientId"];
-            _config.Route53AccessKey = AwsSettings.Settings.Route53AccessKey;
-            _config.Route53SecretKey = AwsSettings.Settings.Route53SecretKey;
+            _config.Route53AccessKey = awsConfigSection.ElementInformation.Properties["route53AccessKey"].Value.ToString();
+            _config.Route53SecretKey = awsConfigSection.ElementInformation.Properties["route53SecretKey"].Value.ToString();
             _config.RunAtSystemStart = bool.Parse(ConfigurationManager.AppSettings["RunAtSystemStart"]);
 
             _config.DomainList = new List<HostedDomainInfo>();
+            var domainConfigSection = configFile.GetSection("domainSettings") as DomainSettings;
+            var domainList = domainConfigSection.ElementInformation.Properties;
             foreach (DomainElement domainInfo in DomainSettings.Settings.DomainList)
             {
                 if (!string.IsNullOrEmpty(domainInfo.SubDomain) && !string.IsNullOrEmpty(domainInfo.ZoneId))
@@ -55,11 +58,15 @@ namespace DynDns53.Core
 
             // AWS section
             var awsConfigSection = configFile.GetSection("awsSettings");
+            awsConfigSection.SectionInformation.ForceSave = true;
+            string rawXml = awsConfigSection.SectionInformation.GetRawXml();
             awsConfigSection.ElementInformation.Properties["route53AccessKey"].Value = config.Route53AccessKey;
             awsConfigSection.ElementInformation.Properties["route53SecretKey"].Value = config.Route53SecretKey;
+            
 
             // Domain info
             var domainConfigSection = configFile.GetSection("domainSettings") as DomainSettings;
+            domainConfigSection.SectionInformation.ForceSave = true;
             domainConfigSection.DomainList.Clear();
 
             foreach (var domain in config.DomainList)
@@ -67,7 +74,7 @@ namespace DynDns53.Core
                 domainConfigSection.DomainList.Add( new DomainElement() { SubDomain = domain.DomainName, ZoneId = domain.ZoneId } );
             }
             
-            configFile.Save(ConfigurationSaveMode.Modified);
+            configFile.Save(ConfigurationSaveMode.Full);
         }
     }
 }

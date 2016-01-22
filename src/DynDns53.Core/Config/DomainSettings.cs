@@ -2,7 +2,6 @@
 
 namespace DynDns53.Core
 {
-    
     public class DomainSettings : ConfigurationSection
     {
         private static DomainSettings settings = ConfigurationManager.GetSection("domainSettings") as DomainSettings;
@@ -10,7 +9,6 @@ namespace DynDns53.Core
         {
             get
             {
-
                 return settings;
             }
         }

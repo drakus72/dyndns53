@@ -15,5 +15,10 @@ namespace DynDns53.Core
         public string Route53AccessKey { get; set; }
         public string Route53SecretKey { get; set; }
         public bool RunAtSystemStart { get; set; }
+
+        public DynDns53Config()
+        {
+            DomainList = new List<HostedDomainInfo>();
+        }
     }
 }
