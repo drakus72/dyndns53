@@ -1,14 +1,1 @@
-﻿{
-	"UpdateInterval": 10,
-	"RunAtSystemStart": true,
-	"AwsSettings": {
-		"route53AccessKey": "XAKIAIU73Y2NGFOL3R5VA",
-		"route53SecretKey": "X+yXhN+TI0gNCeTY/TD9aEnDyhyrY/x3hcyajWoH2"
-	},
-	"DomainSettings": [
-		{
-			"subdomain": "home.volki.info.",
-			"zoneId": "Z2VSE5WEFVMBW9"
-		}
-	]
-}
+﻿{"ClientId":null,"UpdateInterval":10,"DomainList":[{"DomainName":"543","ZoneId":"543"}],"Route53AccessKey":"453","Route53SecretKey":"543","RunAtSystemStart":true}
