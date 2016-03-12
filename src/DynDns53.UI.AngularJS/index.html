@@ -1,0 +1,128 @@
+<!DOCTYPE HTML>
+<html ng-app="dyndns53App">
+  <head>
+    <script src="js/angular.min.js"></script>
+    <script src="js/moment.min.js"></script> 
+    <script src="js/aws-sdk-2.2.39.min.js"></script>
+    <script src="js/jquery-1.12.1.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="app/dyndns53.js"></script>
+
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="css/dyndns53.css">
+  </head>
+  <body>
+    <nav class="navbar navbar-default">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="#">
+            <img src="img/DynDns53Logo.png" width="80" height="40">
+          </a>
+        </div>
+        <h1>DynDns53</h1>
+        <h4>Online dynamic DNS tool</h4>
+        <a href="https://github.com/volkanx/dyndns53"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/652c5b9acfaddf3a9c326fa6bde407b87f7be0f4/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6f72616e67655f6666373630302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png"></a>
+      </div>
+    </nav>
+    <div class="img-rounded" style="background-color: #fdb506;">
+      <button type="button" class="btn btn-info" data-toggle="collapse" data-target="#usageDiv" id="toggleUsageButton">Hide usage</button>
+      <div class="container-fluid collapse in" id="usageDiv">
+        <h3>Usage</h3>
+        <div class="row">
+          <div class="col-sm-1"><img src="img/information.png" width="128" height="128" /></div>
+          <div class="col-sm-9 information">
+              <p>DynDns53 is a dynamic DNS tool running on your browser that doesn't require any software installation. To be able to use DynDns53, you'd need an AWS account.</p>
+              <b>AWS Setup:</b>
+              <p>First create an IAM account with full Route 53 access privileges on the domains you are planning to use with DynDns53.</p>
+              <p>Then create an a A record for the domain or subdomain</p>
+              <b>DynsDns53 Setup:</b>
+              <p>Enter your AWS access and secret key.</p>
+              <p>Add the domain(s) you want to update to the list</p>
+              <p>Press Start Updating. As long as you keep the window open in your browser the domains will be updated with your current external IP address.</p>
+              <p><b>Please note, your keys never leave your browser. Everything is stored locally on your browser so if you switched browsers or incognito mode you'd have to re-enter the settings.</b></p>
+          </div>
+          <div class="col-sm-2">
+          </div>
+        </div>
+      </div>
+
+    </div>
+    
+    <div ng-controller="SettingsController" ng-init="loadValues()" class="img-rounded" style="background-color: #05cafb;">
+      <h3>Settings</h3>
+      
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-sm-3"><label>Update interval:</label></div>
+          <div class="col-sm-9"><input type="number" ng-model="updateInterval" class="input" value=5 maxlength=4 min=1 step=1 /> &nbsp;minutes</div>
+        </div>
+        <div class="row">
+          <div class="col-sm-3"><label>Route53 Access Key:</label></div>
+          <div class="col-sm-9"><input type="text" ng-model="accessKey" placeholder="AWS Access Key with Route53 access" required size="50" /></div>
+        </div>
+        <div class="row">
+          <div class="col-sm-3"><label>Route53 Secret Key:</label></div>
+          <div class="col-sm-9"><input type="text" ng-model="secretKey" placeholder="AWS Secret Key with Route53 access" required size="50" /></div>
+        </div>
+        <div class="row">
+          <div class="col-sm-3"><label>Max log lines to keep:</label></div>
+          <div class="col-sm-9"><input type="number" ng-model="maxLogRowCount" class="input" value=100 maxlength=4 min=1 step=1 /></div>
+        </div>
+
+        <div class="row">
+          <div class="col-sm-3"><label>Domain List:</label></div>
+          <div class="col-sm-9">
+            <table>
+              <thead><tr><th>Domain Name</th><th>Zone ID</th><th></th></tr></thead>
+              <tbody>
+                <tr ng-repeat="domain in domainList.domains track by $index">
+                    <td><input type="text" ng-model="domain.name" /></td>
+                    <td><input type="text" ng-model="domain.zoneId" /></td>
+                    <td><img src="img/cross_16x16.png" ng-click="deleteDomain(domain.name)" /></td>
+                </tr>
+              </tbody>
+            </table>
+            <input type="button" value="Add domain" ng-click="addDomain()" />
+          </div>
+        </div>
+      </div>
+      <input type="button" value="Save Settings" ng-click="saveValues()" />
+    </div>
+
+    <div ng-controller="UpdateController as update" class="img-rounded" style="background-color: #fdb506;">
+      <h3>Update DNS</h3>
+      <input type="button" value="Update IP" ng-click="updateAllDomains()" />
+      <input type="button" value="Start Updating" ng-click="startUpdating()" />
+      <input type="button" value="Stop Updating" ng-click="stopUpdating()" />
+    </div>
+
+
+    <div class="img-rounded" style="background-color: #05cafb;">
+      <h3>Event Log</h3>
+      <div class="container-fluid">
+        <div class="row">
+          <textarea rows="10" cols="120" ng-model="logDataString"></textarea>    
+        </div>
+        <div class="row">
+          <input type="button" value="Clear event log" ng-click="clearLog()" />  
+        </div>
+      </div>
+    </div>
+
+    <div id="footer">
+        <p class="copyright text-center">Developed by <a href="http://volkanpaksoy.com" target="_">Volkan Paksoy</a> </P>
+    </div>
+  </body>
+</html>
+
+
+<script>
+$('#toggleUsageButton').click(function(){
+    $(this).text(function(i,old){
+        return old=='Hide usage' ?  'Show usage' : 'Hide usage';
+    });
+});
+</script>
+
+

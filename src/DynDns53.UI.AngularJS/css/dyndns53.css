@@ -1,0 +1,29 @@
+h1 h2 h3 h4 {
+	font-style: bold;	
+}
+
+input[type=number] {
+    width: 40px;
+} 
+
+.input {
+	transition:all linear 0.5s;
+	background: transparent;
+}
+
+.input.ng-invalid {
+	color:white;
+	background: red;
+}
+
+
+.information {
+	font-family: "Times New Roman", Times, serif;
+ 	font-style: normal;
+ 	font-size: 18px;
+}
+
+.copyright {
+	font-size: 20px;
+
+}
