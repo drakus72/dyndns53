@@ -26,7 +26,7 @@ app.controller('SettingsController', ['$scope', '$rootScope', 'LocalStorage', fu
 
        $rootScope.updateInterval = parseInt(LocalStorage.getData('updateInterval'));
        $rootScope.maxLogRowCount = parseInt(LocalStorage.getData('maxLogRowCount'));
-       $rootScope.accessKey = LocalStorage.getData('accessKey');
+       $rootScope.accessKey = LocalStorage.getData('accessKey') != null ? LocalStorage.getData('accessKey') : '';
        $rootScope.secretKey = LocalStorage.getData('secretKey');
        $rootScope.domainList = JSON.parse(LocalStorage.getData('domainList'));
        if ($rootScope.domainList == null) {
@@ -63,25 +63,19 @@ app.controller('SettingsController', ['$scope', '$rootScope', 'LocalStorage', fu
 
 app.controller('UpdateController', ['$scope', '$rootScope', '$http', 'ExternalIP', '$interval', function($scope, $rootScope, $http, ExternalIP, $interval) {
   
-  intervalfunc = function(){ $scope.updateAllDomains(); }
+  intervalfunc = function(){ 
+    $scope.updateAllDomains(); 
+  }
   var intervalPromise;
 
-/*
-  $scope.getExternalIP = function() {
-      $http.get('https://67ml6xrmha.execute-api.eu-west-1.amazonaws.com/dev')
-        .success(function(data) {
-      });
-  } 
-*/
-
   $scope.startUpdating = function() {
-    // console.log('start updating domains')    
-    intervalPromise = $interval(intervalfunc, ($scope.updateInterval * 3 * 1000));
+    intervalPromise = $interval(intervalfunc, ($scope.updateInterval * 60 * 1000));
+    $scope.updating = true;
   }
 
   $scope.stopUpdating = function() {
-    // console.log('stop updating domains')    
     $interval.cancel(intervalPromise)
+    $scope.updating = false;
   }
 
   $scope.updateAllDomains = function() {
@@ -151,42 +145,15 @@ app.controller('UpdateController', ['$scope', '$rootScope', '$http', 'ExternalIP
 
     route53.changeResourceRecordSets(params, function(err, data) {
       if (err) { 
-        
-        $rootScope.$emit('rootScope:log', "change" +  err); 
-        // console.log(err, err.stack);
+        $rootScope.$emit('rootScope:log', err); 
       }
       else { 
-        $rootScope.$emit('rootScope:log', "success:" +  data); 
+        $rootScope.$emit('rootScope:log', data); 
         console.log(data);
       }
     });
   }
 }]);
-
-/*
-app.controller('LogController as logger', ['$scope', '$rootScope', 
-  function($scope, $rootScope) {
-
-    $scope.logData = []
-    $scope.logDataString = ""
-
-    $scope.clearLog = function() {
-      $scope.logData = []
-      $scope.logDataString = ""
-    }
-
-    $scope.startLogger = function() {
-      $rootScope.$emit('rootScope:log', 'Lets go!'); 
-    }
-
-    $rootScope.$on('rootScope:log', function (event, data) {
-      var logLine = moment().format('D/MM/YYYY HH:mm:ss') + '\t' + data; //+ '\n';
-      $scope.logData.unshift(logLine);
-      $scope.logDataString = $scope.logData.join('\n');
-    });
-
-}]);
-*/
 
 
 app.factory('ExternalIP', function ($http) {
