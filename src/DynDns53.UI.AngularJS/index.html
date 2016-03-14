@@ -59,19 +59,19 @@
         <div class="container-fluid">
           <div class="row">
             <div class="col-sm-3"><label>Update interval:</label></div>
-            <div class="col-sm-9"><input type="number" ng-model="updateInterval" class="input" value=5 maxlength=4 min=1 step=1 /> &nbsp;minutes</div>
+            <div class="col-sm-9"><input type="number" ng-model="$root.updateInterval" class="input" maxlength=4 min=1 step=1 /> &nbsp;minutes</div>
           </div>
           <div class="row">
             <div class="col-sm-3"><label>Route53 Access Key:</label></div>
-            <div class="col-sm-9"><input type="text" ng-model="accessKey" placeholder="AWS Access Key with Route53 access" required size="50" /></div>
+            <div class="col-sm-9"><input type="text" ng-model="$root.accessKey" placeholder="AWS Access Key with Route53 access" required size="50" /></div>
           </div>
           <div class="row">
             <div class="col-sm-3"><label>Route53 Secret Key:</label></div>
-            <div class="col-sm-9"><input type="text" ng-model="secretKey" placeholder="AWS Secret Key with Route53 access" required size="50" /></div>
+            <div class="col-sm-9"><input type="text" ng-model="$root.secretKey" placeholder="AWS Secret Key with Route53 access" required size="50" /></div>
           </div>
           <div class="row">
             <div class="col-sm-3"><label>Max log lines to keep:</label></div>
-            <div class="col-sm-9"><input type="number" ng-model="maxLogRowCount" class="input" value=50 maxlength=6 min=1 step=1 /></div>
+            <div class="col-sm-9"><input type="number" ng-model="$root.maxLogRowCount" class="input" maxlength=6 min=1 step=1 /></div>
           </div>
 
           <div class="row">
@@ -115,7 +115,8 @@
     </div>
 
     <div id="footer">
-        <p class="copyright text-center">Developed by <a href="http://volkanpaksoy.com" target="_">Volkan Paksoy</a> </P>
+        <p class="copyright text-center">Developed by <a href="http://volkanpaksoy.com" target="_">Volkan Paksoy</a> </p>
+        <p class="text-center">v1.00</p>
     </div>
   </body>
 </html>

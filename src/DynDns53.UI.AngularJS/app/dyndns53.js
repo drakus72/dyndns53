@@ -24,9 +24,11 @@ app.controller('SettingsController', ['$scope', '$rootScope', 'LocalStorage', fu
     $scope.loadValues = function() {
        $rootScope.$emit('rootScope:log', 'Loading configuration values from the local storage');
 
-       $rootScope.updateInterval = parseInt(LocalStorage.getData('updateInterval'));
-       $rootScope.maxLogRowCount = parseInt(LocalStorage.getData('maxLogRowCount'));
-       $rootScope.accessKey = LocalStorage.getData('accessKey') != null ? LocalStorage.getData('accessKey') : '';
+       $rootScope.updateInterval = isNaN(parseInt(LocalStorage.getData('updateInterval'))) ? 5 : parseInt(LocalStorage.getData('updateInterval'));
+       console.log($rootScope.updateInterval)
+
+       $rootScope.maxLogRowCount = isNaN(parseInt(LocalStorage.getData('maxLogRowCount'))) ? 50 : parseInt(LocalStorage.getData('maxLogRowCount'));
+       $rootScope.accessKey = LocalStorage.getData('accessKey');
        $rootScope.secretKey = LocalStorage.getData('secretKey');
        $rootScope.domainList = JSON.parse(LocalStorage.getData('domainList'));
        if ($rootScope.domainList == null) {
@@ -36,13 +38,16 @@ app.controller('SettingsController', ['$scope', '$rootScope', 'LocalStorage', fu
 
     $scope.saveValues = function() {
       $rootScope.$emit('rootScope:log', 'Saving configuration values to the local storage');
+
+      console.log($rootScope.updateInterval)
+      LocalStorage.setData('updateInterval', $rootScope.updateInterval)
       
-      LocalStorage.setData('updateInterval', $scope.updateInterval)
-      LocalStorage.setData('maxLogRowCount', $scope.maxLogRowCount)
-      LocalStorage.setData('accessKey', $scope.accessKey)
-      LocalStorage.setData('secretKey', $scope.secretKey)
+
+      LocalStorage.setData('maxLogRowCount', $rootScope.maxLogRowCount)
+      LocalStorage.setData('accessKey', $rootScope.accessKey)
+      LocalStorage.setData('secretKey', $rootScope.secretKey)
       $scope.trimEmptyEntries();
-      LocalStorage.setData('domainList', JSON.stringify($scope.domainList))
+      LocalStorage.setData('domainList', JSON.stringify($rootScope.domainList))
     };
 
     $scope.addDomain = function() {
@@ -71,11 +76,17 @@ app.controller('UpdateController', ['$scope', '$rootScope', '$http', 'ExternalIP
   $scope.startUpdating = function() {
     intervalPromise = $interval(intervalfunc, ($scope.updateInterval * 60 * 1000));
     $scope.updating = true;
+
+    var logMessage = "Starting auto-update at every: " + $scope.updateInterval + " minutes";
+    $rootScope.$emit('rootScope:log', logMessage);
   }
 
   $scope.stopUpdating = function() {
     $interval.cancel(intervalPromise)
     $scope.updating = false;
+
+    var logMessage = "Stopping auto-update";
+    $rootScope.$emit('rootScope:log', logMessage);
   }
 
   $scope.updateAllDomains = function() {
@@ -107,7 +118,7 @@ app.controller('UpdateController', ['$scope', '$rootScope', '$http', 'ExternalIP
                      externalIPAddress = response.data.ip;
                      $scope.changeIP(domainName, zoneId, externalIPAddress)
 
-                     var logMessage = "Updating domain: " + domainName + " ZoneID: " + zoneId + " with IP Address: " + externalIPAddress;
+                     var logMessage = "Updated domain: " + domainName + " ZoneID: " + zoneId + " with IP Address: " + externalIPAddress;
                      $rootScope.$emit('rootScope:log', logMessage);
                  });
               }
@@ -145,11 +156,11 @@ app.controller('UpdateController', ['$scope', '$rootScope', '$http', 'ExternalIP
 
     route53.changeResourceRecordSets(params, function(err, data) {
       if (err) { 
-        $rootScope.$emit('rootScope:log', err); 
+        $rootScope.$emit('rootScope:log', err.message); 
       }
       else { 
-        $rootScope.$emit('rootScope:log', data); 
-        console.log(data);
+        // $rootScope.$emit('rootScope:log', data); 
+        // console.log(data);
       }
     });
   }
