@@ -163,8 +163,7 @@ app.controller('UpdateController', ['$scope', '$rootScope', '$http', 'ExternalIP
 
 
 app.factory('ExternalIP', function ($http) {
-//  return $http.get('https://67ml6xrmha.execute-api.eu-west-1.amazonaws.com/dev', { cache: false });
-    return $http.get('http://checkip.amazonaws.com', { cache: false });
+  return $http.get('https://67ml6xrmha.execute-api.eu-west-1.amazonaws.com/dev', { cache: false });
 });
 
 app.factory("LocalStorage", function($window, $rootScope) {
