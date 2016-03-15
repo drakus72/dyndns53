@@ -25,8 +25,6 @@ app.controller('SettingsController', ['$scope', '$rootScope', 'LocalStorage', fu
        $rootScope.$emit('rootScope:log', 'Loading configuration values from the local storage');
 
        $rootScope.updateInterval = isNaN(parseInt(LocalStorage.getData('updateInterval'))) ? 5 : parseInt(LocalStorage.getData('updateInterval'));
-       console.log($rootScope.updateInterval)
-
        $rootScope.maxLogRowCount = isNaN(parseInt(LocalStorage.getData('maxLogRowCount'))) ? 50 : parseInt(LocalStorage.getData('maxLogRowCount'));
        $rootScope.accessKey = LocalStorage.getData('accessKey');
        $rootScope.secretKey = LocalStorage.getData('secretKey');
@@ -35,6 +33,9 @@ app.controller('SettingsController', ['$scope', '$rootScope', 'LocalStorage', fu
           $rootScope.domainList = { "domains": [] }
        }
     };
+
+
+
 
     $scope.saveValues = function() {
       $rootScope.$emit('rootScope:log', 'Saving configuration values to the local storage');
@@ -154,7 +155,7 @@ app.controller('UpdateController', ['$scope', '$rootScope', '$http', 'ExternalIP
         $rootScope.$emit('rootScope:log', err.message); 
       }
       else { 
-        var logMessage = "Updated domain: " + domainName + " ZoneID: " + zoneId + " with IP Address: " + externalIPAddress;
+        var logMessage = "Updated domain: " + domainName + " ZoneID: " + zoneId + " with IP Address: " + newIPAddress;
         $rootScope.$emit('rootScope:log', logMessage);
       }
     });
