@@ -33,8 +33,8 @@
       <div class="container-fluid collapse in" id="usageDiv">
         <h3>Usage</h3>
         <div class="row">
-          <div class="col-sm-1"><img src="img/information.png" width="128" height="128" /></div>
-          <div class="col-sm-9 information">
+          <div class="col-sm-2"><img src="img/information.png" width="128" height="128" /></div>
+          <div class="col-sm-10 information">
               <p>DynDns53 is a dynamic DNS tool running on your browser that doesn't require any software installation. To be able to use DynDns53, you'd need an AWS account.</p>
               <b>AWS Setup:</b>
               <p>First create an IAM account with full Route 53 access privileges on the domains you are planning to use with DynDns53.</p>
@@ -44,8 +44,6 @@
               <p>Add the domain(s) you want to update to the list</p>
               <p>Press Start Updating. As long as you keep the window open in your browser the domains will be updated with your current external IP address.</p>
               <p><b>Please note, your keys never leave your browser. Everything is stored locally on your browser so if you switch browsers or go incognito, you'll have to re-enter the settings.</b></p>
-          </div>
-          <div class="col-sm-2">
           </div>
         </div>
       </div>
@@ -58,25 +56,25 @@
       <form name="settingsForm">
         <div class="container-fluid">
           <div class="row">
-            <div class="col-sm-3"><label>Update interval:</label></div>
-            <div class="col-sm-9"><input type="number" ng-model="$root.updateInterval" class="input" maxlength=4 min=1 step=1 /> &nbsp;minutes</div>
+            <div class="col-sm-2"><label>Update interval:</label></div>
+            <div class="col-sm-10"><input type="number" ng-model="$root.updateInterval" class="input" maxlength=4 min=1 step=1 /> &nbsp;minutes</div>
           </div>
           <div class="row">
-            <div class="col-sm-3"><label>Route53 Access Key:</label></div>
-            <div class="col-sm-9"><input type="text" ng-model="$root.accessKey" placeholder="AWS Access Key with Route53 access" required size="50" /></div>
+            <div class="col-sm-2"><label>Route53 Access Key:</label></div>
+            <div class="col-sm-10"><input type="text" ng-model="$root.accessKey" placeholder="AWS Access Key with Route53 access" required size="50" /></div>
           </div>
           <div class="row">
-            <div class="col-sm-3"><label>Route53 Secret Key:</label></div>
-            <div class="col-sm-9"><input type="text" ng-model="$root.secretKey" placeholder="AWS Secret Key with Route53 access" required size="50" /></div>
+            <div class="col-sm-2"><label>Route53 Secret Key:</label></div>
+            <div class="col-sm-10"><input type="text" ng-model="$root.secretKey" placeholder="AWS Secret Key with Route53 access" required size="50" /></div>
           </div>
           <div class="row">
-            <div class="col-sm-3"><label>Max log lines to keep:</label></div>
-            <div class="col-sm-9"><input type="number" ng-model="$root.maxLogRowCount" class="input" maxlength=6 min=1 step=1 /></div>
+            <div class="col-sm-2"><label>Max log lines to keep:</label></div>
+            <div class="col-sm-10"><input type="number" ng-model="$root.maxLogRowCount" class="input" maxlength=6 min=1 step=1 /></div>
           </div>
 
           <div class="row">
-            <div class="col-sm-3"><label>Domain List:</label></div>
-            <div class="col-sm-9">
+            <div class="col-sm-2"><label>Domain List:</label></div>
+            <div class="col-sm-10">
               <table>
                 <thead><tr><th>Domain Name</th><th>Zone ID</th><th></th></tr></thead>
                 <tbody>

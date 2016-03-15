@@ -117,9 +117,6 @@ app.controller('UpdateController', ['$scope', '$rootScope', '$http', 'ExternalIP
                 ExternalIP.then(function(response){
                      externalIPAddress = response.data.ip;
                      $scope.changeIP(domainName, zoneId, externalIPAddress)
-
-                     var logMessage = "Updated domain: " + domainName + " ZoneID: " + zoneId + " with IP Address: " + externalIPAddress;
-                     $rootScope.$emit('rootScope:log', logMessage);
                  });
               }
           });
@@ -161,6 +158,8 @@ app.controller('UpdateController', ['$scope', '$rootScope', '$http', 'ExternalIP
       else { 
         // $rootScope.$emit('rootScope:log', data); 
         // console.log(data);
+        var logMessage = "Updated domain: " + domainName + " ZoneID: " + zoneId + " with IP Address: " + externalIPAddress;
+        $rootScope.$emit('rootScope:log', logMessage);
       }
     });
   }
