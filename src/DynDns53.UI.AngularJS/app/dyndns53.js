@@ -39,10 +39,8 @@ app.controller('SettingsController', ['$scope', '$rootScope', 'LocalStorage', fu
     $scope.saveValues = function() {
       $rootScope.$emit('rootScope:log', 'Saving configuration values to the local storage');
 
-      console.log($rootScope.updateInterval)
+    //  console.log($rootScope.updateInterval)
       LocalStorage.setData('updateInterval', $rootScope.updateInterval)
-      
-
       LocalStorage.setData('maxLogRowCount', $rootScope.maxLogRowCount)
       LocalStorage.setData('accessKey', $rootScope.accessKey)
       LocalStorage.setData('secretKey', $rootScope.secretKey)
@@ -156,8 +154,6 @@ app.controller('UpdateController', ['$scope', '$rootScope', '$http', 'ExternalIP
         $rootScope.$emit('rootScope:log', err.message); 
       }
       else { 
-        // $rootScope.$emit('rootScope:log', data); 
-        // console.log(data);
         var logMessage = "Updated domain: " + domainName + " ZoneID: " + zoneId + " with IP Address: " + externalIPAddress;
         $rootScope.$emit('rootScope:log', logMessage);
       }
@@ -167,7 +163,8 @@ app.controller('UpdateController', ['$scope', '$rootScope', '$http', 'ExternalIP
 
 
 app.factory('ExternalIP', function ($http) {
-  return $http.get('https://67ml6xrmha.execute-api.eu-west-1.amazonaws.com/dev', { cache: false });
+//  return $http.get('https://67ml6xrmha.execute-api.eu-west-1.amazonaws.com/dev', { cache: false });
+    return $http.get('http://checkip.amazonaws.com', { cache: false });
 });
 
 app.factory("LocalStorage", function($window, $rootScope) {
