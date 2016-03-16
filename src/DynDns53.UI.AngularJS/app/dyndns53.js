@@ -1,4 +1,4 @@
-var app = angular.module('dyndns53App', []);
+var app = angular.module('dyndns53App', ['timer']);
 
 app.run(function($rootScope) {
     
@@ -18,12 +18,10 @@ app.run(function($rootScope) {
     });
 })
 
-
 app.controller('SettingsController', ['$scope', '$rootScope', 'LocalStorage', function($scope, $rootScope, LocalStorage) {
-
     $scope.loadValues = function() {
        $rootScope.$emit('rootScope:log', 'Loading configuration values from the local storage');
-
+       
        $rootScope.updateInterval = isNaN(parseInt(LocalStorage.getData('updateInterval'))) ? 5 : parseInt(LocalStorage.getData('updateInterval'));
        $rootScope.maxLogRowCount = isNaN(parseInt(LocalStorage.getData('maxLogRowCount'))) ? 50 : parseInt(LocalStorage.getData('maxLogRowCount'));
        $rootScope.accessKey = LocalStorage.getData('accessKey');
@@ -34,13 +32,9 @@ app.controller('SettingsController', ['$scope', '$rootScope', 'LocalStorage', fu
        }
     };
 
-
-
-
     $scope.saveValues = function() {
       $rootScope.$emit('rootScope:log', 'Saving configuration values to the local storage');
 
-    //  console.log($rootScope.updateInterval)
       LocalStorage.setData('updateInterval', $rootScope.updateInterval)
       LocalStorage.setData('maxLogRowCount', $rootScope.maxLogRowCount)
       LocalStorage.setData('accessKey', $rootScope.accessKey)
@@ -65,33 +59,37 @@ app.controller('SettingsController', ['$scope', '$rootScope', 'LocalStorage', fu
 }]);
 
 
-app.controller('UpdateController', ['$scope', '$rootScope', '$http', 'ExternalIP', '$interval', function($scope, $rootScope, $http, ExternalIP, $interval) {
+app.controller('UpdateController', ['$scope', '$rootScope', '$http', 'GetExternalIP', '$interval', function($scope, $rootScope, $http, GetExternalIP, $interval) {
   
+  var updating = false;
+
   intervalfunc = function(){ 
+    $scope.$broadcast('auto-update-timer-restart');
     $scope.updateAllDomains(); 
   }
-  var intervalPromise;
 
-  $scope.startUpdating = function() {
-    intervalPromise = $interval(intervalfunc, ($scope.updateInterval * 60 * 1000));
-    $scope.updating = true;
-
-    var logMessage = "Starting auto-update at every: " + $scope.updateInterval + " minutes";
-    $rootScope.$emit('rootScope:log', logMessage);
-  }
-
-  $scope.stopUpdating = function() {
-    $interval.cancel(intervalPromise)
-    $scope.updating = false;
-
-    var logMessage = "Stopping auto-update";
-    $rootScope.$emit('rootScope:log', logMessage);
+  $scope.toggleAutoUpdate = function() {
+    if ($scope.updating) {
+      // Stop
+      $scope.updating = false;
+      $interval.cancel(intervalPromise);
+      $scope.$broadcast('auto-update-stop');
+      var logMessage = "Stopping auto-update";
+      $rootScope.$emit('rootScope:log', logMessage);
+    } else {
+      // Start
+      $scope.updating = true;
+      intervalPromise = $interval(intervalfunc, ($scope.updateInterval * 60 * 1000));
+      $scope.$broadcast('auto-update-start');
+      var logMessage = "Starting auto-update at every: " + $scope.updateInterval + " minutes";
+      $rootScope.$emit('rootScope:log', logMessage);
+    }
   }
 
   $scope.updateAllDomains = function() {
-      angular.forEach($rootScope.domainList.domains, function(value, key) {
-        $scope.updateDomainInfo(value.name, value.zoneId);
-      });
+    angular.forEach($rootScope.domainList.domains, function(value, key) {
+      $scope.updateDomainInfo(value.name, value.zoneId);
+    });
   }
 
   $scope.updateDomainInfo = function(domainName, zoneId) {
@@ -108,14 +106,21 @@ app.controller('UpdateController', ['$scope', '$rootScope', '$http', 'ExternalIP
     route53.listResourceRecordSets(params, function(err, data) {
         if (err) { 
           $rootScope.$emit('rootScope:log', err.message);
-          console.log(err.message);
+          $rootScope.$apply();
         } else {
           angular.forEach(data.ResourceRecordSets, function(value, key) {
+              // console.log(value.ResourceRecords[0]);
+              // console.log(key);
               if (value.Name.slice(0, -1) == domainName) {
                 var externalIPAddress = "";
-                ExternalIP.then(function(response){
+                GetExternalIP
+                  .then(function(response) {
                      externalIPAddress = response.data.ip;
-                     $scope.changeIP(domainName, zoneId, externalIPAddress)
+                     if (value.ResourceRecords[0].Value != externalIPAddress) {
+                       $scope.changeIP(domainName, zoneId, externalIPAddress)
+                     } else {
+                        $rootScope.$emit('rootScope:log', 'IP address is up-to-date. Skipping update.');
+                     }
                  });
               }
           });
@@ -158,12 +163,31 @@ app.controller('UpdateController', ['$scope', '$rootScope', '$http', 'ExternalIP
         var logMessage = "Updated domain: " + domainName + " ZoneID: " + zoneId + " with IP Address: " + newIPAddress;
         $rootScope.$emit('rootScope:log', logMessage);
       }
+
+      $rootScope.$apply();
     });
   }
 }]);
 
+app.controller('TimerController', ['$scope', '$rootScope', function($scope, $rootScope) {
+  $scope.$on('auto-update-start', function (event, data) {
+      $scope.countdown = $scope.updateInterval * 60
+      $scope.$broadcast('timer-reset');
+      $scope.$broadcast('timer-add-cd-seconds', $scope.countdown);
+    });
 
-app.factory('ExternalIP', function ($http) {
+  $scope.$on('auto-update-stop', function (event, data) {
+      $scope.$broadcast('timer-reset');
+    });
+
+  $scope.$on('auto-update-timer-restart', function (event, data) {
+      $scope.countdown = $scope.updateInterval * 60
+      $scope.$broadcast('timer-reset');
+      $scope.$broadcast('timer-add-cd-seconds', $scope.countdown);
+    });
+}]);
+
+app.factory('GetExternalIP', function ($http) {
   return $http.get('https://67ml6xrmha.execute-api.eu-west-1.amazonaws.com/dev', { cache: false });
 });
 

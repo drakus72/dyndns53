@@ -2,7 +2,10 @@
 <html ng-app="dyndns53App">
   <head>
     <script src="js/angular.min.js"></script>
-    <script src="js/moment.min.js"></script> 
+    <script src="bower_components/moment/min/moment.min.js"></script> 
+    <script src="bower_components/moment/min/locales.min.js"></script> 
+    <script src="bower_components/humanize-duration/humanize-duration.js"></script> 
+    <script src="js/angular-timer.min.js"></script> 
     <script src="js/aws-sdk-2.2.39.min.js"></script>
     <script src="js/jquery-1.12.1.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
@@ -47,12 +50,10 @@
           </div>
         </div>
       </div>
-
     </div>
     
     <div ng-controller="SettingsController" ng-init="loadValues()" class="img-rounded alt-div-color2">
       <h3>Settings</h3>
-      
       <form name="settingsForm">
         <div class="container-fluid">
           <div class="row">
@@ -71,7 +72,6 @@
             <div class="col-sm-2"><label>Max log lines to keep:</label></div>
             <div class="col-sm-10"><input type="number" ng-model="$root.maxLogRowCount" class="input" maxlength=6 min=1 step=1 /></div>
           </div>
-
           <div class="row">
             <div class="col-sm-2"><label>Domain List:</label></div>
             <div class="col-sm-10">
@@ -93,18 +93,25 @@
       <input type="button" value="Save Settings" class="btn-primary" ng-click="saveValues()" ng-disabled="settingsForm.$invalid" />
     </div>
 
-    <div ng-controller="UpdateController as update" class="img-rounded alt-div-color1">
+    <div ng-controller="UpdateController" class="img-rounded alt-div-color1">
       <h3>Update DNS</h3>
       <input type="button" value="Update IP now" ng-click="updateAllDomains()" class="btn-primary" ng-disabled="settingsForm.$invalid" />
-      <input type="button" value="Start auto-update" ng-click="startUpdating()" class="btn-success"  ng-class="{true: 'disabled', false: 'enabled'}[update.updating]" />
-      <input type="button" value="Stop auto-update" ng-click="stopUpdating()" class="btn-danger" />
+      <input type="button" value="{{ updating ? 'Stop auto-update' : 'Start auto-update' }}" ng-click="toggleAutoUpdate()" 
+             class="btn-success" ng-class="{'btn-success': (updating == false), 'btn-danger': (updating == true)}" />
+
+      <div ng-controller="TimerController" ng-hide=!updating>
+        <br />
+        <b>Next update in: 
+          <timer interval="1000" countdown="1">{{countdown}}</timer> &nbsp;seconds
+        </b>
+      </div>
     </div>
 
     <div class="img-rounded alt-div-color2">
       <h3>Event Log</h3>
       <div class="container-fluid">
         <div class="row">
-          <textarea rows="10" cols="120" ng-model="logDataString"></textarea>    
+          <textarea rows="10" cols="120" ng-model="$root.logDataString"></textarea>    
         </div>
         <div class="row">
           <input type="button" value="Clear event log" ng-click="clearLog()" class="btn-primary" />  
