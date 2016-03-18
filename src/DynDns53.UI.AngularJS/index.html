@@ -10,7 +10,15 @@
     <script src="js/aws-sdk-2.2.39.min.js"></script>
     <script src="js/jquery-1.12.1.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
+    
     <script src="app/dyndns53.js"></script>
+    <script src="app/controllers/UsageController.js"></script>
+    <script src="app/controllers/SettingsController.js"></script>
+    <script src="app/controllers/UpdateController.js"></script>
+    <script src="app/controllers/TimerController.js"></script>
+    <script src="app/directives/domainListChecks.js"></script>
+    <script src="app/factories/GetExternalIP.js"></script>
+    <script src="app/factories/LocalStorage.js"></script>
 
     <link rel="stylesheet" href="css/bootstrap.min.css">
     <link rel="stylesheet" href="css/bootstrap-theme.min.css">
@@ -40,13 +48,22 @@
           <div class="col-sm-10 information">
               <p>DynDns53 is a dynamic DNS tool running on your browser that doesn't require any software installation. To be able to use DynDns53, you'd need an AWS account.</p>
               <b>AWS Setup:</b>
-              <p>First create an IAM account with full Route 53 access privileges on the domains you are planning to use with DynDns53.</p>
-              <p>Then create an a A record for the domain or subdomain</p>
+              <p>
+                <ul>
+                  <li>First create an IAM account with full Route 53 access privileges on the domains you are planning to use with DynDns53.</li>
+                  <li>Then create an a A record for the domain or subdomain</li>
+                </ul>
+              </p>
               <b>DynsDns53 Setup:</b>
-              <p>Enter your AWS access and secret key.</p>
-              <p>Add the domain(s) you want to update to the list</p>
-              <p>Press Start Updating. As long as you keep the window open in your browser the domains will be updated with your current external IP address.</p>
-              <p><b>Please note, your keys never leave your browser. Everything is stored locally on your browser so if you switch browsers or go incognito, you'll have to re-enter the settings.</b></p>
+              <p>
+                <ul>
+                  <li>Enter your AWS access and secret key.</li>
+                  <li>Add the domain(s) you want to update to the list</li>
+                  <li>It's highly encouraged to test the settings by pressing <i>Update IP now</i> button</li>
+                  <li>Press <i>Start auto-update</i> button. As long as you keep the window open in your browser the domains will be updated with your current external IP address.</li>
+                </ul>
+              </p>              
+              <p><b>Please note, your keys never leave your browser. Everything is stored locally. If you switch browsers or go incognito, you'll have to re-enter the settings.</b></p>
           </div>
         </div>
       </div>
@@ -60,6 +77,11 @@
             <div class="col-sm-2"><label>Update interval:</label></div>
             <div class="col-sm-10">
               <input type="number" name="updateInterval" ng-model="$root.updateInterval" class="input" maxlength=4 min=1 step=1 required="required" /> &nbsp;minutes 
+              <div ng-messages="settingsForm.updateInterval.$error">
+                <p ng-message="required"><img src="img/info_16x16.png" />&nbsp;<i>An integer value between 1-9999 is required</i></p>
+                <p ng-message="maxlength"><img src="img/info_16x16.png" />&nbsp;<i>An integer value between 1-9999 is required</i></p>
+                <p ng-message="min"><img src="img/info_16x16.png" />&nbsp;<i>An integer value between 1-9999 is required</i></p>                
+              </div>
             </div>
           </div>
           <div class="row">
@@ -67,21 +89,29 @@
             <div class="col-sm-10">
               <input type="text" name="accessKey" ng-model="$root.accessKey" placeholder="AWS Access Key with Route53 access" size="50" required="required" />
               <div ng-messages="settingsForm.accessKey.$error">
-                <p ng-message="required"><i>AWS Access Key is required</i></p>
+                <p ng-message="required"><img src="img/info_16x16.png" />&nbsp;<i>AWS Access Key is required</i></p>
               </div>
             </div>
           </div>
           <div class="row">
             <div class="col-sm-2"><label>Route53 Secret Key:</label></div>
-            <div class="col-sm-10"><input type="text" name="secretKey" ng-model="$root.secretKey" placeholder="AWS Secret Key with Route53 access" size="50" required="required" />
+            <div class="col-sm-10">
+              <input type="text" name="secretKey" ng-model="$root.secretKey" placeholder="AWS Secret Key with Route53 access" size="50" required="required" />
               <div ng-messages="settingsForm.secretKey.$error">
-                <p ng-message="required"><i>AWS Secret Key is required</i></p>
+                <p ng-message="required"><img src="img/info_16x16.png" />&nbsp;<i>AWS Secret Key is required</i></p>
               </div>
             </div>
           </div>
           <div class="row">
             <div class="col-sm-2"><label>Max log lines to keep:</label></div>
-            <div class="col-sm-10"><input type="number" ng-model="$root.maxLogRowCount" class="input" maxlength=6 min=1 step=1 required="required" /></div>
+            <div class="col-sm-10">
+                <input type="number" name="maxLogRowCount" ng-model="$root.maxLogRowCount" class="input" maxlength=4 min=1 step=1 required="required" />
+                <div ng-messages="settingsForm.maxLogRowCount.$error">
+                  <p ng-message="required"><img src="img/info_16x16.png" />&nbsp;<i>An integer value between 1-9999 is required</i></p>
+                  <p ng-message="maxlength"><img src="img/info_16x16.png" />&nbsp;<i>An integer value between 1-9999 is required</i></p>
+                  <p ng-message="min"><img src="img/info_16x16.png" />&nbsp;<i>An integer value between 1-9999 is required</i></p>
+                </div>
+            </div>
           </div>
           <div class="row">
             <div class="col-sm-2"><label>Domain List:</label></div>
@@ -105,7 +135,7 @@
               <input type="hidden" name="domainListHidden" ng-model="domainList" domain-list-checks>
               <input type="button" value="Add domain" class="btn-success" ng-click="addDomain()" />
               <div ng-messages="settingsForm.domainListHidden.$error">
-                <p ng-message="emptyDomainList"><i>At least 1 domain is required</i></p>
+                <p ng-message="emptyDomainList"><img src="img/info_16x16.png" />&nbsp;<i>At least 1 domain is required</i></p>
                 <p ng-message="nameAndZoneIdRequired"><i>Domain name and zone ID are required</i></p>
               </div>              
             </div>
@@ -117,16 +147,10 @@
 
     <div ng-controller="UpdateController" class="img-rounded alt-div-color1">
       <h3>Update DNS</h3>
-      <input type="button" value="Update IP now" ng-click="updateAllDomains()" class="btn-primary" ng-disabled="!formSaved" />
+      <input type="button" value="Update IP now" ng-click="updateAllDomains()" class="btn-primary" />
       <input type="button" value="{{ updating ? 'Stop auto-update' : 'Start auto-update' }}" 
-              ng-disabled="!formSaved" ng-click="toggleAutoUpdate()" 
+             ng-click="toggleAutoUpdate()" 
              class="btn-success" ng-class="{'btn-success': (updating == false), 'btn-danger': (updating == true)}" />
-
-      <span class="field-tip" ng-show="!formSaved">
-        <img src="img/information_bubble_16x16.png"/>
-        <span class="tip-content">Please enter the required values to enable update buttons</span>
-      </span>
-
       <div ng-controller="TimerController" ng-hide="!updating">
         <br />
         <b>Next update in: 
