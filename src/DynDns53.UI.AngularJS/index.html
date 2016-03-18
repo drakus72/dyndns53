@@ -5,6 +5,7 @@
     <script src="bower_components/moment/min/moment.min.js"></script> 
     <script src="bower_components/moment/min/locales.min.js"></script> 
     <script src="bower_components/humanize-duration/humanize-duration.js"></script> 
+    <script src="bower_components/angular-messages/angular-messages.js"></script>
     <script src="js/angular-timer.min.js"></script> 
     <script src="js/aws-sdk-2.2.39.min.js"></script>
     <script src="js/jquery-1.12.1.min.js"></script>
@@ -27,13 +28,12 @@
           <h1 class="header1">DynDns53</h1>
           <h4 class="header4">Online dynamic DNS tool</h4>
         </div>
-        
         <a href="https://github.com/volkanx/dyndns53"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/652c5b9acfaddf3a9c326fa6bde407b87f7be0f4/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6f72616e67655f6666373630302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png"></a>
       </div>
     </nav>
-    <div class="img-rounded alt-div-color1">
-      <button type="button" class="btn btn-info" data-toggle="collapse" data-target="#usageDiv" id="toggleUsageButton">Hide usage</button>
-      <div class="container-fluid collapse in" id="usageDiv">
+    <div ng-controller="UsageController" class="img-rounded alt-div-color1">
+      <button type="button" class="btn btn-info" ng-click="toggleUsage()">{{toggleUsageButtonText}}</button>
+      <div class="container-fluid collapse" ng-class="{'in': (hideUsage == 'false')}">
         <h3>Usage</h3>
         <div class="row">
           <div class="col-sm-2"><img src="img/information.png" width="128" height="128" /></div>
@@ -51,55 +51,83 @@
         </div>
       </div>
     </div>
-    
+
     <div ng-controller="SettingsController" ng-init="loadValues()" class="img-rounded alt-div-color2">
       <h3>Settings</h3>
-      <form name="settingsForm">
+      <form name="settingsForm" ng-submit="saveValues()" novalidate formValidator>
         <div class="container-fluid">
           <div class="row">
             <div class="col-sm-2"><label>Update interval:</label></div>
-            <div class="col-sm-10"><input type="number" ng-model="$root.updateInterval" class="input" maxlength=4 min=1 step=1 /> &nbsp;minutes</div>
+            <div class="col-sm-10">
+              <input type="number" name="updateInterval" ng-model="$root.updateInterval" class="input" maxlength=4 min=1 step=1 required="required" /> &nbsp;minutes 
+            </div>
           </div>
           <div class="row">
             <div class="col-sm-2"><label>Route53 Access Key:</label></div>
-            <div class="col-sm-10"><input type="text" ng-model="$root.accessKey" placeholder="AWS Access Key with Route53 access" required size="50" /></div>
+            <div class="col-sm-10">
+              <input type="text" name="accessKey" ng-model="$root.accessKey" placeholder="AWS Access Key with Route53 access" size="50" required="required" />
+              <div ng-messages="settingsForm.accessKey.$error">
+                <p ng-message="required"><i>AWS Access Key is required</i></p>
+              </div>
+            </div>
           </div>
           <div class="row">
             <div class="col-sm-2"><label>Route53 Secret Key:</label></div>
-            <div class="col-sm-10"><input type="text" ng-model="$root.secretKey" placeholder="AWS Secret Key with Route53 access" required size="50" /></div>
+            <div class="col-sm-10"><input type="text" name="secretKey" ng-model="$root.secretKey" placeholder="AWS Secret Key with Route53 access" size="50" required="required" />
+              <div ng-messages="settingsForm.secretKey.$error">
+                <p ng-message="required"><i>AWS Secret Key is required</i></p>
+              </div>
+            </div>
           </div>
           <div class="row">
             <div class="col-sm-2"><label>Max log lines to keep:</label></div>
-            <div class="col-sm-10"><input type="number" ng-model="$root.maxLogRowCount" class="input" maxlength=6 min=1 step=1 /></div>
+            <div class="col-sm-10"><input type="number" ng-model="$root.maxLogRowCount" class="input" maxlength=6 min=1 step=1 required="required" /></div>
           </div>
           <div class="row">
             <div class="col-sm-2"><label>Domain List:</label></div>
             <div class="col-sm-10">
+              
               <table>
                 <thead><tr><th>Domain Name</th><th>Zone ID</th><th></th></tr></thead>
                 <tbody>
                   <tr ng-repeat="domain in domainList.domains track by $index">
-                      <td><input type="text" ng-model="domain.name" /></td>
-                      <td><input type="text" ng-model="domain.zoneId" /></td>
-                      <td><img src="img/cancel_16x16.png" ng-click="deleteDomain(domain.name)" /></td>
+                      <td><input type="text" ng-model="domain.name" required="required" ng-change="domainsUpdated()" /></td>
+                      <td><input type="text" ng-model="domain.zoneId" required="required" ng-change="domainsUpdated()" /></td>
+                      <td>
+                        <span class="field-tip">
+                          <img src="img/cancel_16x16.png" ng-click="deleteDomain($index)" />
+                          <span class="tip-content">Remove this domain from the list</span>
+                        </span>
+                      </td>
                   </tr>
                 </tbody>
               </table>
+              <input type="hidden" name="domainListHidden" ng-model="domainList" domain-list-checks>
               <input type="button" value="Add domain" class="btn-success" ng-click="addDomain()" />
+              <div ng-messages="settingsForm.domainListHidden.$error">
+                <p ng-message="emptyDomainList"><i>At least 1 domain is required</i></p>
+                <p ng-message="nameAndZoneIdRequired"><i>Domain name and zone ID are required</i></p>
+              </div>              
             </div>
           </div>
         </div>
+        <input type="submit" value="Save Settings" class="btn-primary" ng-disabled="settingsForm.$invalid" />
       </form>
-      <input type="button" value="Save Settings" class="btn-primary" ng-click="saveValues()" ng-disabled="settingsForm.$invalid" />
     </div>
 
     <div ng-controller="UpdateController" class="img-rounded alt-div-color1">
       <h3>Update DNS</h3>
-      <input type="button" value="Update IP now" ng-click="updateAllDomains()" class="btn-primary" ng-disabled="settingsForm.$invalid" />
-      <input type="button" value="{{ updating ? 'Stop auto-update' : 'Start auto-update' }}" ng-click="toggleAutoUpdate()" 
+      <input type="button" value="Update IP now" ng-click="updateAllDomains()" class="btn-primary" ng-disabled="!formSaved" />
+      <input type="button" value="{{ updating ? 'Stop auto-update' : 'Start auto-update' }}" 
+              ng-disabled="!formSaved" ng-click="toggleAutoUpdate()" 
              class="btn-success" ng-class="{'btn-success': (updating == false), 'btn-danger': (updating == true)}" />
 
-      <div ng-controller="TimerController" ng-hide=!updating>
+      <span class="field-tip" ng-show="!formSaved">
+        <img src="img/information_bubble_16x16.png"/>
+        <span class="tip-content">Please enter the required values to enable update buttons</span>
+      </span>
+
+      <div ng-controller="TimerController" ng-hide="!updating">
         <br />
         <b>Next update in: 
           <timer interval="1000" countdown="1">{{countdown}}</timer> &nbsp;seconds
@@ -126,13 +154,7 @@
 </html>
 
 
-<script>
-$('#toggleUsageButton').click(function(){
-    $(this).text(function(i,old){
-        return old == 'Hide usage' ?  'Show usage' : 'Hide usage';
-    });
-});
-</script>
+
 
 
 <script>
